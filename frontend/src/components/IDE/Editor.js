@@ -4,6 +4,9 @@ import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { parseTmTheme } from "monaco-themes";
 import prettier from "prettier/standalone";
 import parserBabel from "prettier/parser-babel";
+import { AppBar, Toolbar, IconButton, Typography, Select, MenuItem, Box } from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import themeIcon from "@mui/icons-material/Brightness4";
 
 const EditorComponent = ({ language, value, onChange, theme, options }) => {
   const editorRef = useRef(null);
@@ -59,43 +62,61 @@ const EditorComponent = ({ language, value, onChange, theme, options }) => {
   }, [theme]);
 
   return (
-    <>
-      <div className="theme-selector">
-        <select
-          value={currentTheme}
-          onChange={(e) => applyTheme(e.target.value)}
-        >
-          <option value="vs-dark">Dark Theme</option>
-          <option value="light">Light Theme</option>
-        </select>
-      </div>
-      <MonacoEditor
-        height="90vh"
-        language={language}
-        value={value}
-        theme={currentTheme}
-        options={{
-          fontSize: 14,
-          minimap: { enabled: true },
-          scrollBeyondLastLine: false,
-          automaticLayout: true,
-          wordWrap: "on",
-          renderWhitespace: "all",
-          formatOnType: true,
-          formatOnPaste: true,
-          folding: true,
-          renderLineHighlight: "all",
-          tabSize: 2,
-          bracketPairColorization: true,
-          autoClosingBrackets: "always",
-          autoClosingQuotes: "always",
-          suggestOnTriggerCharacters: true,
-          quickSuggestions: true,
-          ...options,
-        }}
-        onMount={handleEditorDidMount}
-      />
-    </>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", bgcolor: "#1e1e1e" }}>
+      <AppBar position="static" sx={{ bgcolor: "#333" }}>
+        <Toolbar variant="dense">
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            CodeSphere Editor
+          </Typography>
+          <Select
+            value={currentTheme}
+            onChange={(e) => applyTheme(e.target.value)}
+            variant="outlined"
+            size="small"
+            sx={{
+              color: "#fff",
+              bgcolor: "#555",
+              marginRight: 2,
+              ".MuiOutlinedInput-notchedOutline": { border: 0 },
+            }}
+          >
+            <MenuItem value="vs-dark">Dark Theme</MenuItem>
+            <MenuItem value="light">Light Theme</MenuItem>
+          </Select>
+          <IconButton color="inherit">
+            <PlayArrowIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <MonacoEditor
+          height="100%"
+          language={language}
+          value={value}
+          theme={currentTheme}
+          options={{
+            fontSize: 14,
+            minimap: { enabled: true },
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            wordWrap: "on",
+            renderWhitespace: "all",
+            formatOnType: true,
+            formatOnPaste: true,
+            folding: true,
+            renderLineHighlight: "all",
+            tabSize: 2,
+            bracketPairColorization: true,
+            autoClosingBrackets: "always",
+            autoClosingQuotes: "always",
+            suggestOnTriggerCharacters: true,
+            quickSuggestions: true,
+            ...options,
+          }}
+          onMount={handleEditorDidMount}
+        />
+      </Box>
+    </Box>
   );
 };
 
