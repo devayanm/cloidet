@@ -1,0 +1,84 @@
+codesphere/
+│
+├── backend/
+│   ├── config/
+│   │   ├── db.js                     # MongoDB connection setup
+│   │   └── socket.js                 # WebSocket configuration and event handling
+│   ├── controllers/
+│   │   ├── authController.js         # Authentication and user management
+│   │   ├── projectController.js      # Project and file management
+│   │   ├── collaborationController.js# Real-time collaboration logic
+│   │   └── gitController.js          # Git integration (commit, push, pull, etc.)
+│   ├── models/
+│   │   ├── User.js                   # User schema
+│   │   ├── Project.js                # Project schema
+│   │   ├── File.js                   # File schema
+│   │   └── Collaboration.js          # Collaboration session schema
+│   ├── routes/
+│   │   ├── authRoutes.js             # Routes for authentication
+│   │   ├── projectRoutes.js          # Routes for project management
+│   │   ├── collaborationRoutes.js    # Routes for collaboration (WebSocket-based)
+│   │   └── gitRoutes.js              # Routes for Git operations
+│   ├── services/
+│   │   ├── aiService.js              # AI/ML-driven code suggestion logic
+│   │   ├── gitService.js             # Git service (handling Git commands)
+│   │   ├── fileService.js            # File system operations
+│   │   └── userService.js            # User-related operations
+│   ├── utils/
+│   │   ├── authMiddleware.js         # JWT authentication middleware
+│   │   ├── errorHandler.js           # Error handling middleware
+│   │   └── logger.js                 # Logger for request and error tracking
+│   ├── app.js                        # Main Express app
+│   ├── server.js                     # Server setup and initialization
+│   └── package.json                  # Backend dependencies and scripts
+│
+├── frontend/
+│   ├── public/
+│   │   ├── index.html                # Main HTML file
+│   │   └── favicon.ico               # Favicon for the app
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Auth/
+│   │   │   │   ├── Login.js          # Login page
+│   │   │   │   ├── Register.js       # Register page
+│   │   │   │   └── AuthForm.js       # Reusable form component for login/register
+│   │   │   ├── IDE/
+│   │   │   │   ├── Editor.js         # Main code editor using CodeMirror/Monaco
+│   │   │   │   ├── FileTree.js       # File explorer tree
+│   │   │   │   ├── Terminal.js       # Built-in terminal
+│   │   │   │   ├── LivePreview.js    # Live preview component
+│   │   │   │   └── Collaborators.js  # Sidebar showing active collaborators
+│   │   │   ├── Dashboard/
+│   │   │   │   ├── Projects.js       # List of user projects
+│   │   │   │   ├── NewProject.js     # Create new project interface
+│   │   │   │   └── ProjectCard.js    # Reusable project card component
+│   │   │   └── Shared/
+│   │   │       ├── Navbar.js         # Navigation bar
+│   │   │       ├── Sidebar.js        # Sidebar for project navigation
+│   │   │       ├── Loader.js         # Loading spinner
+│   │   │       └── Modal.js          # Reusable modal component
+│   │   ├── context/
+│   │   │   ├── AuthContext.js        # Context for authentication state
+│   │   │   ├── ProjectContext.js     # Context for project and file management
+│   │   │   └── CollaborationContext.js # Context for real-time collaboration state
+│   │   ├── hooks/
+│   │   │   ├── useAuth.js            # Custom hook for authentication logic
+│   │   │   ├── useEditor.js          # Custom hook for editor interactions
+│   │   │   └── useWebSocket.js       # Custom hook for WebSocket interactions
+│   │   ├── pages/
+│   │   │   ├── AuthPage.js           # Page for login and registration
+│   │   │   ├── Dashboard.js          # User dashboard with project overview
+│   │   │   └── IDEPage.js            # Main IDE page with editor, terminal, and live preview
+│   │   ├── services/
+│   │   │   ├── api.js                # API service for backend communication
+│   │   │   └── socketService.js      # WebSocket service for real-time collaboration
+│   │   ├── App.js                    # Main React component
+│   │   ├── index.js                  # Entry point for React app
+│   │   ├── routes.js                 # Route definitions for the app
+│   │   └── package.json              # Frontend dependencies and scripts
+│
+├── docker-compose.yml                 # Docker setup for backend, frontend, and MongoDB
+├── Dockerfile                         # Dockerfile for backend container
+├── README.md                          # Project documentation and setup instructions
+├── .env                               # Environment variables (use .env.example for reference)
+└── .gitignore                         # Files and directories to ignore in version control
