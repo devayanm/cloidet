@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 export const CollaborationContext = createContext();
 const socket = io('http://localhost:5000');
 
-const CollaborationContextProvider = ({ children }) => {
+export const CollaborationContextProvider = ({ children }) => {
   const [collaborators, setCollaborators] = useState([]);
 
   useEffect(() => {
@@ -23,5 +23,3 @@ const CollaborationContextProvider = ({ children }) => {
     </CollaborationContext.Provider>
   );
 };
-
-export default CollaborationContextProvider;

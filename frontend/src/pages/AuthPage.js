@@ -1,58 +1,87 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, Paper } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api'; 
+import {
+  Container,
+  Paper,
+  Typography,
+  Tabs,
+  Tab,
+  Box,
+  CircularProgress,
+  Snackbar,
+  Alert,
+  Button
+} from '@mui/material';
+import Login from '../components/Auth/Login';
+import Register from '../components/Auth/Register';
 
 const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+  const [value, setValue] = useState(0); 
+  const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleTabChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleFormSubmit = async (formType) => {
+    setLoading(true);
     try {
-      const response = isLogin
-        ? await api.post('/auth/login', { email, password })
-        : await api.post('/auth/register', { email, password });
-      localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
+      await new Promise((resolve) => setTimeout(resolve, 2000)); 
+      setSnackbarMessage(`${formType} successful!`);
+      setSnackbarSeverity('success');
     } catch (error) {
-      console.error('Authentication failed', error);
+      setSnackbarMessage(`Failed to ${formType.toLowerCase()}.`);
+      setSnackbarSeverity('error');
+    } finally {
+      setLoading(false);
+      setSnackbarOpen(true);
     }
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper elevation={3} style={{ padding: '20px' }}>
-        <Typography variant="h5">{isLogin ? 'Login' : 'Register'}</Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            type="password"
-            label="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button type="submit" fullWidth variant="contained" color="primary">
-            {isLogin ? 'Login' : 'Register'}
-          </Button>
-          <Button fullWidth onClick={() => setIsLogin(!isLogin)}>
-            Switch to {isLogin ? 'Register' : 'Login'}
-          </Button>
-        </form>
+    <Container component="main" maxWidth="xs" sx={{ mt: 4 }}>
+      <Paper elevation={3} sx={{ padding: 4 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          CodeSphere Authentication
+        </Typography>
+        <Tabs value={value} onChange={handleTabChange} aria-label="authentication tabs">
+          <Tab label="Login" />
+          <Tab label="Register" />
+        </Tabs>
+        <Box sx={{ mt: 2 }}>
+          {value === 0 && (
+            <Login onSubmit={() => handleFormSubmit('Login')} />
+          )}
+          {value === 1 && (
+            <Register onSubmit={() => handleFormSubmit('Register')} />
+          )}
+        </Box>
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <CircularProgress />
+          </Box>
+        )}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+          message={snackbarMessage}
+          action={
+            <Button color="inherit" onClick={handleSnackbarClose}>
+              Close
+            </Button>
+          }
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Paper>
     </Container>
   );

@@ -1,33 +1,51 @@
-import React, { createContext, useState } from 'react';
-import axios from 'axios';
+import React, { createContext, useState, useEffect } from 'react';
+import api from '../services/api';
 
 export const AuthContext = createContext();
 
-const AuthContextProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await api.get('/auth/me');
+        setUser(response.data);
+      } catch (error) {
+        console.error('Failed to fetch user data', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
   const login = async (email, password) => {
-    const { data } = await axios.post('/api/auth/login', { email, password });
-    setUser(data.user);
-    localStorage.setItem('token', data.token);
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      setUser(response.data.user);
+    } catch (error) {
+      console.error('Login failed', error);
+    }
   };
 
-  const register = async (name, email, password) => {
-    const { data } = await axios.post('/api/auth/register', { name, email, password });
-    setUser(data.user);
-    localStorage.setItem('token', data.token);
+  const register = async (email, name, password) => {
+    try {
+      const response = await api.post('/auth/register', { email, name, password });
+      setUser(response.data.user);
+    } catch (error) {
+      console.error('Registration failed', error);
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export default AuthContextProvider;

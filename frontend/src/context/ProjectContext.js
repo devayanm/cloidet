@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const ProjectContext = createContext();
 
-const ProjectContextProvider = ({ children }) => {
+export const ProjectContextProvider = ({ children }) => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
@@ -19,12 +19,9 @@ const ProjectContextProvider = ({ children }) => {
     setProjects([...projects, data]);
   };
 
-
   return (
     <ProjectContext.Provider value={{ projects, createProject }}>
       {children}
     </ProjectContext.Provider>
   );
 };
-
-export default ProjectContextProvider;
