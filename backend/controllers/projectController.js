@@ -90,37 +90,40 @@ exports.addFile = async (req, res) => {
     }
   };
   
-  exports.updateFile = async (req, res) => {
-    try {
-      const { content } = req.body;
-      let project = await Project.findById(req.params.projectId);
+exports.updateFile = async (req, res) => {
+  try {
+    const { content } = req.body;
+    let project = await Project.findById(req.params.projectId);
+
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+    if (project.user.toString() !== req.user.id) return res.status(401).json({ msg: 'Not authorized' });
+
+    const file = project.files.id(req.params.fileId);
+    if (!file) return res.status(404).json({ msg: 'File not found' });
+
+    file.content = content;
+    project = await project.save();
+
+    req.io.to(req.params.projectId).emit('receiveFileUpdate', { fileId: req.params.fileId, content });
+
+    res.json(file);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
+};
+
   
-      if (!project) return res.status(404).json({ msg: 'Project not found' });
-      if (project.user.toString() !== req.user.id) return res.status(401).json({ msg: 'Not authorized' });
-  
-      const file = project.files.id(req.params.fileId);
-      if (!file) return res.status(404).json({ msg: 'File not found' });
-  
-      file.content = content;
-      project = await project.save();
-      res.json(file);
-    } catch (err) {
-      res.status(500).send('Server Error');
-    }
-  };
-  
-  exports.deleteFile = async (req, res) => {
-    try {
-      let project = await Project.findById(req.params.projectId);
-  
-      if (!project) return res.status(404).json({ msg: 'Project not found' });
-      if (project.user.toString() !== req.user.id) return res.status(401).json({ msg: 'Not authorized' });
-  
-      project.files = project.files.filter(file => file.id !== req.params.fileId);
-      project = await project.save();
-      res.json({ msg: 'File removed' });
-    } catch (err) {
-      res.status(500).send('Server Error');
-    }
-  };
-  
+exports.deleteFile = async (req, res) => {
+  try {
+    let project = await Project.findById(req.params.projectId);
+
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+    if (project.user.toString() !== req.user.id) return res.status(401).json({ msg: 'Not authorized' });
+
+    project.files = project.files.filter(file => file.id !== req.params.fileId);
+    project = await project.save();
+    res.json({ msg: 'File removed' });
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
+};
