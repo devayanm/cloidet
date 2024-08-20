@@ -48,7 +48,7 @@ const AuthPage = () => {
     <Container component="main" maxWidth="xs" sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ padding: 4 }}>
         <Typography variant="h4" align="center" gutterBottom>
-          CodeSphere Authentication
+          Cloidet
         </Typography>
         <Tabs value={value} onChange={handleTabChange} aria-label="authentication tabs">
           <Tab label="Login" />

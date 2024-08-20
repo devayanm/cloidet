@@ -55,7 +55,7 @@ const Navbar = () => {
     <AppBar position="static" sx={{ boxShadow: 0, backgroundColor: theme.palette.primary.main }}>
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1, color: theme.palette.primary.contrastText }}>
-          CodeSphere
+          Cloidet
         </Typography>
         {isMobile ? (
           <>
