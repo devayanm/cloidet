@@ -1,19 +1,27 @@
 import React, { createContext, useState, useEffect } from 'react';
 import api from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const auth = useAuth();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await api.get('/auth/me');
-        setUser(response.data);
+        const token = localStorage.getItem('token');
+        if (token) {
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          const response = await api.get('/auth/me');
+          setUser(response.data);
+        }
       } catch (error) {
         console.error('Failed to fetch user data', error);
+        setError('Failed to fetch user data');
       } finally {
         setLoading(false);
       }
@@ -21,30 +29,15 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  const login = async (email, password) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      setUser(response.data.user);
-    } catch (error) {
-      console.error('Login failed', error);
-    }
-  };
-
-  const register = async (email, name, password) => {
-    try {
-      const response = await api.post('/auth/register', { email, name, password });
-      setUser(response.data.user);
-    } catch (error) {
-      console.error('Registration failed', error);
-    }
-  };
-
-  const logout = () => {
-    setUser(null);
-  };
-
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        ...auth
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

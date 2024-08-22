@@ -1,22 +1,32 @@
-import React, { useState } from 'react';
-import { TextField, Button, Typography, Paper, CircularProgress, Box, Link } from '@mui/material';
-import { useAuth } from '../../hooks/useAuth';
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  CircularProgress,
+  Box,
+  Link,
+} from "@mui/material";
+import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Register = ({ onSubmit }) => {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const { register, loading } = useAuth();
+  const navigate = useNavigate();
 
   const validateForm = () => {
     if (!name || !email || !password || !confirmPassword) {
-      setError('All fields are required.');
+      setError("All fields are required.");
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError("Passwords do not match.");
       return false;
     }
     return true;
@@ -25,12 +35,13 @@ const Register = ({ onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      setError(''); // Clear previous errors
+      setError("");
       try {
         await register(email, name, password);
-        if (onSubmit) onSubmit(); // Call onSubmit prop if provided
+        if (onSubmit) onSubmit();
+        navigate("/login");
       } catch (err) {
-        setError('Registration failed. Please try again.');
+        setError("Registration failed. Please try again.");
       }
     }
   };
@@ -50,7 +61,7 @@ const Register = ({ onSubmit }) => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           error={!!error && !name}
-          helperText={error && !name ? 'Name is required.' : ''}
+          helperText={error && !name ? "Name is required." : ""}
         />
         <TextField
           variant="outlined"
@@ -62,7 +73,7 @@ const Register = ({ onSubmit }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           error={!!error && !email}
-          helperText={error && !email ? 'Email is required.' : ''}
+          helperText={error && !email ? "Email is required." : ""}
         />
         <TextField
           variant="outlined"
@@ -74,7 +85,7 @@ const Register = ({ onSubmit }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           error={!!error && !password}
-          helperText={error && !password ? 'Password is required.' : ''}
+          helperText={error && !password ? "Password is required." : ""}
         />
         <TextField
           variant="outlined"
@@ -86,7 +97,9 @@ const Register = ({ onSubmit }) => {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           error={!!error && !confirmPassword}
-          helperText={error && !confirmPassword ? 'Please confirm your password.' : ''}
+          helperText={
+            error && !confirmPassword ? "Confirm password is required." : ""
+          }
         />
         <Button
           type="submit"
@@ -96,15 +109,19 @@ const Register = ({ onSubmit }) => {
           sx={{ mt: 2 }}
           disabled={loading}
         >
-          {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Register'}
+          {loading ? (
+            <CircularProgress size={24} sx={{ color: "white" }} />
+          ) : (
+            "Register"
+          )}
         </Button>
         {error && (
-          <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
+          <Typography color="error" sx={{ mt: 2, textAlign: "center" }}>
             {error}
           </Typography>
         )}
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
-          <Link href="#" variant="body2" onClick={() => alert('Login feature is not implemented yet.')}>
+        <Box sx={{ mt: 2, textAlign: "center" }}>
+          <Link href="#" variant="body2" onClick={() => navigate("/login")}>
             Already have an account? Login
           </Link>
         </Box>

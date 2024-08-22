@@ -1,101 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Container,
-  TextField,
-  Button,
   Typography,
   Paper,
   Avatar,
-  IconButton,
   Grid,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  Box,
+  Button,
+  IconButton,
   Divider,
-  Switch,
-  FormControlLabel
+  Box,
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
-import api from '../services/api';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth'; 
+import AuthForm from '../components/Auth/AuthForm';
 
 const UserProfilePage = () => {
-  const [user, setUser] = useState({
-    email: '',
-    name: '',
-    profilePicture: '',
-    password: '',
-    newPassword: '',
-    confirmNewPassword: '',
-    theme: 'light',
-    notifications: true
-  });
-  const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const { user, logout, deleteUser } = useAuth();
+  const [formAction, setFormAction] = useState('');
+  const navigate = useNavigate(); 
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get('/user/profile');
-        setUser(response.data);
-      } catch (error) {
-        setError('Failed to fetch user profile');
-        console.error('Failed to fetch user profile', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, []);
 
-  const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+  const handleFormAction = (action) => {
+    setFormAction(action);
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFile(file);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('name', user.name);
-    formData.append('email', user.email);
-    if (file) {
-      formData.append('profilePicture', file);
-    }
-    if (user.newPassword && user.newPassword === user.confirmNewPassword) {
-      formData.append('password', user.password);
-      formData.append('newPassword', user.newPassword);
-    }
-
+  const handleLogout = async () => {
     try {
-      await api.put('/user/profile', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setSuccess('Profile updated successfully!');
-      setOpenSnackbar(true);
+      await logout();
+      navigate('/'); 
     } catch (error) {
-      setError('Failed to update profile');
-      console.error('Failed to update profile', error);
-      setOpenSnackbar(true);
-    } finally {
-      setLoading(false);
+      console.error('Logout failed', error);
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-    setSuccess('');
-    setError('');
+  const handleDeleteAccount = async () => {
+    await deleteUser();
+    // Additional logic if needed
   };
 
   return (
@@ -104,112 +45,65 @@ const UserProfilePage = () => {
         <Typography variant="h5" gutterBottom>
           User Profile
         </Typography>
-        {loading && <CircularProgress sx={{ display: 'block', margin: 'auto' }} />}
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} sm={4} container justifyContent="center">
-              <Avatar
-                alt={user.name}
-                src={user.profilePicture || '/default-profile.png'}
-                sx={{ width: 120, height: 120 }}
-              />
+        <Grid container spacing={3} alignItems="center">
+          <Grid item xs={12} sm={4} container justifyContent="center">
+            <Avatar
+              alt={user?.name || 'User'}
+              src={user?.profilePicture || '/default-profile.png'}
+              sx={{ width: 120, height: 120 }}
+            />
+            <IconButton color="primary" component="label">
+              <PhotoCamera />
               <input
+                hidden
                 accept="image/*"
-                id="profile-picture"
                 type="file"
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
+                onChange={(e) => handleFormAction('uploadProfilePicture')}
               />
-              <label htmlFor="profile-picture">
-                <IconButton color="primary" component="span">
-                  <PhotoCamera />
-                </IconButton>
-              </label>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                label="Name"
-                name="name"
-                value={user.name}
-                onChange={handleChange}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                label="Email"
-                name="email"
-                value={user.email}
-                onChange={handleChange}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                label="Current Password"
-                name="password"
-                type="password"
-                value={user.password}
-                onChange={handleChange}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                label="New Password"
-                name="newPassword"
-                type="password"
-                value={user.newPassword}
-                onChange={handleChange}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                label="Confirm New Password"
-                name="confirmNewPassword"
-                type="password"
-                value={user.confirmNewPassword}
-                onChange={handleChange}
-              />
-              <Box sx={{ mt: 2 }}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={user.theme === 'dark'}
-                      onChange={(e) => setUser({ ...user, theme: e.target.checked ? 'dark' : 'light' })}
-                    />
-                  }
-                  label="Dark Mode"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={user.notifications}
-                      onChange={(e) => setUser({ ...user, notifications: e.target.checked })}
-                    />
-                  }
-                  label="Enable Notifications"
-                />
-              </Box>
-            </Grid>
+            </IconButton>
           </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ mt: 2 }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Save Changes'}
-          </Button>
-        </form>
+          <Grid item xs={12} sm={8}>
+            <Typography variant="h6">Name: {user?.name}</Typography>
+            <Typography variant="body1">Email: {user?.email}</Typography>
+            <Box sx={{ mt: 2 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="primary"
+                onClick={() => handleFormAction('updateProfile')}
+              >
+                Edit Profile
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="secondary"
+                sx={{ mt: 2 }}
+                onClick={() => handleLogout()}
+              >
+                Logout
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="error"
+                sx={{ mt: 2 }}
+                onClick={() => handleDeleteAccount()}
+              >
+                Delete Account
+              </Button>
+              <Button
+                fullWidth
+                variant="text"
+                color="primary"
+                sx={{ mt: 2 }}
+                onClick={() => handleFormAction('forgotPassword')}
+              >
+                Forgot Password
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
         <Divider sx={{ my: 3 }} />
         <Typography variant="h6" gutterBottom>
           Recent Activity
@@ -217,15 +111,10 @@ const UserProfilePage = () => {
         <Typography variant="body2">
           Activity logs will be displayed here.
         </Typography>
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-        >
-          <Alert onClose={handleCloseSnackbar} severity={error ? 'error' : 'success'} sx={{ width: '100%' }}>
-            {error || success}
-          </Alert>
-        </Snackbar>
+        {/* Render AuthForm based on the action */}
+        {formAction && (
+          <AuthForm action={formAction} onClose={() => setFormAction('')} />
+        )}
       </Paper>
     </Container>
   );

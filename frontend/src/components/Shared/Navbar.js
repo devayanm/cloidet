@@ -14,11 +14,12 @@ import {
   Avatar,
   Divider,
 } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useAuth } from '../../hooks/useAuth'; 
 
 const Navbar = () => {
   const theme = useTheme();
@@ -28,6 +29,9 @@ const Navbar = () => {
   const open = Boolean(anchorEl);
   const profileMenuOpen = Boolean(profileMenuAnchorEl);
   const location = useLocation();
+  const navigate = useNavigate(); 
+
+  const { logout } = useAuth(); 
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -45,8 +49,13 @@ const Navbar = () => {
     setProfileMenuAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    // Implement logout logic here
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/'); 
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
   };
 
   const currentPath = location.pathname;

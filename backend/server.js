@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const cors = require('cors');
 const http = require('http');
 const socketio = require('socket.io');
 
@@ -8,7 +9,20 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const io = socketio(server);
+const io = socketio(server, {
+  cors: {
+      origin: 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+      credentials: true
+  }
+});
+
+
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 app.use(express.json());
 app.use((req, res, next) => {

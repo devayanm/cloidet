@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
-import { TextField, Button, Typography, Paper, CircularProgress, Box, Link } from '@mui/material';
-import { useAuth } from '../../hooks/useAuth';
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  CircularProgress,
+  Box,
+  Link,
+} from "@mui/material";
+import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Login = ({ onSubmit }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { login, loading } = useAuth();
+  const navigate = useNavigate();
 
   const validateForm = () => {
     if (!email || !password) {
-      setError('Email and password are required.');
+      setError("Email and password are required.");
       return false;
     }
     return true;
@@ -19,12 +29,13 @@ const Login = ({ onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      setError(''); // Clear previous error
+      setError("");
       try {
         await login(email, password);
-        if (onSubmit) onSubmit(); // Call onSubmit prop if provided
+        if (onSubmit) onSubmit();
+        navigate("/dashboard");
       } catch (err) {
-        setError('Login failed. Please check your credentials and try again.');
+        setError("Login failed. Please check your credentials and try again.");
       }
     }
   };
@@ -45,7 +56,7 @@ const Login = ({ onSubmit }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           error={!!error && !email}
-          helperText={error && !email ? 'Email is required.' : ''}
+          helperText={error && !email ? "Email is required." : ""}
         />
         <TextField
           variant="outlined"
@@ -57,7 +68,7 @@ const Login = ({ onSubmit }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           error={!!error && !password}
-          helperText={error && !password ? 'Password is required.' : ''}
+          helperText={error && !password ? "Password is required." : ""}
         />
         <Button
           type="submit"
@@ -67,15 +78,23 @@ const Login = ({ onSubmit }) => {
           sx={{ mt: 2 }}
           disabled={loading}
         >
-          {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Login'}
+          {loading ? (
+            <CircularProgress size={24} sx={{ color: "white" }} />
+          ) : (
+            "Login"
+          )}
         </Button>
         {error && (
-          <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
+          <Typography color="error" sx={{ mt: 2, textAlign: "center" }}>
             {error}
           </Typography>
         )}
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
-          <Link href="#" variant="body2" onClick={() => alert('Password reset feature is not implemented yet.')}>
+        <Box sx={{ mt: 2, textAlign: "center" }}>
+          <Link
+            href="#"
+            variant="body2"
+            onClick={() => navigate("/forgot-password")}
+          >
             Forgot your password?
           </Link>
         </Box>
