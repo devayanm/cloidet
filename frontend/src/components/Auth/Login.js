@@ -130,7 +130,7 @@ const Login = ({ onSubmit }) => {
           <Link
             href="#"
             variant="body2"
-            onClick={() => navigate("/forgot-password")}
+            onClick={() => navigate("/")}
           >
             Forgot your password?
           </Link>
