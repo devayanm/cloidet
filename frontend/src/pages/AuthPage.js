@@ -41,7 +41,7 @@ const AuthPage = () => {
       if (formType === "Login") {
         navigate("/dashboard");
       } else if (formType === "Register") {
-        navigate("/login");
+        navigate("/");
       }
     } catch (error) {
       setSnackbarMessage(`Failed to ${formType.toLowerCase()}.`);

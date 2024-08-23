@@ -16,25 +16,32 @@ export const useAuth = () => {
       localStorage.setItem("token", token);
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       await fetchUserData(); // Fetch user data after login
+      return true; // Indicate successful login
     } catch (error) {
+      console.error("Login Error:", error); // More detailed logging
       setError(error.response?.data?.message || "Login failed");
+      return false; // Indicate failed login
     } finally {
       setLoading(false);
     }
   };
+  
 
   const fetchUserData = async () => {
     setLoading(true);
-    setError("");
+    setError('');
     try {
-      const response = await api.get("/auth/me");
+      const response = await api.get('/auth/me');
+      console.log('Fetched user data:', response.data); // Debugging
       setUser(response.data);
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to fetch user data");
+      setError(error.response?.data?.message || 'Failed to fetch user data');
     } finally {
       setLoading(false);
     }
   };
+    
+  
   const register = async (email, name, password) => {
     setLoading(true);
     setError("");

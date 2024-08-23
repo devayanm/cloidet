@@ -7,20 +7,37 @@ import {
   CircularProgress,
   Box,
   Link,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  FormControl,
+  OutlinedInput,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 const Login = ({ onSubmit }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
   const validateForm = () => {
-    if (!email || !password) {
-      setError("Email and password are required.");
+    if (!email) {
+      setError("Email is required.");
+      return false;
+    }
+    if (!password) {
+      setError("Password is required.");
       return false;
     }
     return true;
@@ -30,14 +47,21 @@ const Login = ({ onSubmit }) => {
     e.preventDefault();
     if (validateForm()) {
       setError("");
-      try {
-        await login(email, password);
+      const success = await login(email, password);
+      if (success) {
+        setModalOpen(true);
         if (onSubmit) onSubmit();
-        navigate("/dashboard");
-      } catch (err) {
+      } else {
         setError("Login failed. Please check your credentials and try again.");
       }
     }
+  };
+
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    navigate("/dashboard");
   };
 
   return (
@@ -57,19 +81,32 @@ const Login = ({ onSubmit }) => {
           onChange={(e) => setEmail(e.target.value)}
           error={!!error && !email}
           helperText={error && !email ? "Email is required." : ""}
+          autoComplete="off"
         />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={!!error && !password}
-          helperText={error && !password ? "Password is required." : ""}
-        />
+        <FormControl variant="outlined" fullWidth margin="normal">
+          <InputLabel htmlFor="password">Password</InputLabel>
+          <OutlinedInput
+            id="password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={!!error && !password}
+            helperText={error && !password ? "Password is required." : ""}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            label="Password"
+            autoComplete="off"
+          />
+        </FormControl>
         <Button
           type="submit"
           fullWidth
@@ -99,6 +136,20 @@ const Login = ({ onSubmit }) => {
           </Link>
         </Box>
       </form>
+
+      <Dialog open={modalOpen} onClose={handleCloseModal}>
+        <DialogTitle>Login Successful</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You have successfully logged in!
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 };

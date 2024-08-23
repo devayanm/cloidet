@@ -66,7 +66,7 @@ const EditorComponent = ({ language, value, onChange, theme, options }) => {
       <AppBar position="static" sx={{ bgcolor: "#333" }}>
         <Toolbar variant="dense">
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            CodeSphere Editor
+            Cloidet Editor
           </Typography>
           <Select
             value={currentTheme}
