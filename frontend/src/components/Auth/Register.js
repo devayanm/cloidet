@@ -83,7 +83,7 @@ const Register = ({ onSubmit }) => {
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    navigate("/login");
+    navigate("/");
   };
 
   const handleCloseErrorModal = () => {
@@ -192,7 +192,7 @@ const Register = ({ onSubmit }) => {
           )}
         </Button>
         <Box sx={{ mt: 2, textAlign: "center" }}>
-          <Link href="#" variant="body2" onClick={() => navigate("/login")}>
+          <Link href="#" variant="body2" onClick={() => navigate("/")}>
             Already have an account? Login
           </Link>
         </Box>
