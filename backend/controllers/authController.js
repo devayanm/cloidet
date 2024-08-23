@@ -5,7 +5,7 @@ const { body, validationResult } = require("express-validator");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
-// Register a new user
+
 exports.registerUser = [
   body("name", "Name is required").not().isEmpty(),
   body("email", "Please include a valid email").isEmail(),
@@ -36,19 +36,19 @@ exports.registerUser = [
       jwt.sign(
         payload,
         process.env.JWT_SECRET,
-        { expiresIn: 360000 },
+        { expiresIn: "1h" },
         (err, token) => {
           if (err) throw err;
           res.json({ token });
         }
       );
     } catch (err) {
-      res.status(500).send("Server Error");
+      res.status(500).json({ msg: "Server Error" });
     }
   },
 ];
 
-// Login a user
+
 exports.loginUser = [
   body("email", "Please include a valid email").isEmail(),
   body("password", "Password is required").exists(),
@@ -72,32 +72,33 @@ exports.loginUser = [
       jwt.sign(
         payload,
         process.env.JWT_SECRET,
-        { expiresIn: 360000 },
+        { expiresIn: "1h" },
         (err, token) => {
           if (err) throw err;
           res.json({ token });
         }
       );
     } catch (err) {
-      res.status(500).send("Server Error");
+      res.status(500).json({ msg: "Server Error" });
     }
   },
 ];
 
-// Get user data
+
+
 exports.getUserData = async (req, res) => {
   try {
-    const user = req.user;
+    const user = await User.findById(req.user.id).select("-password");
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ msg: "User not found" });
     }
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
 };
 
-// Request password reset
+
 exports.requestPasswordReset = async (req, res) => {
   const { email } = req.body;
   try {
@@ -110,13 +111,19 @@ exports.requestPasswordReset = async (req, res) => {
     await user.save();
 
     const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
     });
+
     const resetUrl = `${req.protocol}://${req.get(
       "host"
     )}/password-reset/${token}`;
     const mailOptions = {
       to: user.email,
-      from: "no-reply@yourapp.com",
+      from: process.env.EMAIL_USER,
       subject: "Password Reset",
       text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
              Please click on the following link, or paste this into your browser to complete the process:\n\n
@@ -131,7 +138,7 @@ exports.requestPasswordReset = async (req, res) => {
   }
 };
 
-// Reset password
+
 exports.resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
   try {
@@ -141,9 +148,7 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user)
-      return res
-        .status(400)
-        .json({ msg: "Password reset token is invalid or has expired" });
+      return res.status(400).json({ msg: "Token is invalid or expired" });
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
@@ -157,7 +162,6 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-// Update user profile
 exports.updateUser = async (req, res) => {
   const { name, email } = req.body;
   try {
@@ -174,7 +178,6 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Logout user
 exports.logoutUser = (req, res) => {
   res.status(200).json({ msg: "Logged out successfully" });
 };

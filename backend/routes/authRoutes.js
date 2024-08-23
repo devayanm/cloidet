@@ -12,17 +12,11 @@ const {
 const authMiddleware = require('../utils/authMiddleware');
 
 router.post('/register', registerUser);
-
 router.post('/login', loginUser);
-
 router.get('/me', authMiddleware, getUserData);
-
 router.post('/password-reset/request', requestPasswordReset);
-
 router.post('/password-reset', resetPassword);
-
 router.put('/me', authMiddleware, updateUser);
-
 router.post('/logout', authMiddleware, logoutUser);
 
 module.exports = router;
